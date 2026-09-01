@@ -1,0 +1,45 @@
+@startuml
+' Composants de miam et briques Laraskel consommees.
+
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+actor "Utilisateur\n(smartphone / PC)" as user
+actor "Administrateur" as admin
+
+package "miam" {
+  component "Panel utilisateur\n(Filament : profil, objectifs,\npesees, repas, bilans, menus)" as app
+  component "Parcours de saisie repas\n(page Filament dediee :\nphoto -> estimation -> ajustement)" as capture
+  component "Visualisations\n(widgets graphiques)" as viz
+  component "Constructeur de contexte\n+ prompts assistant" as ctx
+  component "Import historique\n(weight.csv / food.csv)" as import
+  component "Panel d'administration\n(comptes, roles)" as adminpanel
+}
+
+package "Briques Laraskel (packages Composer)" {
+  component "laraskel-core\n(macros d'audit, conventions)" as core
+  component "gestion utilisateurs + roles\n(Fortify, spatie/permission,\npanel Filament)" as users
+  component "visualisation graphique\n(widgets Filament / ApexCharts)" as dataviz
+  component "llm-bridge\n(Prism : appels, prompts,\nlogs, couts)" as bridge
+}
+
+cloud "Fournisseur LLM" as llm
+database "Disque prive\n(photos de repas)" as disk
+
+user --> app
+user --> capture
+user --> viz
+admin --> adminpanel
+
+app ..> core
+app ..> users
+adminpanel ..> users
+viz ..> dataviz
+capture ..> ctx
+ctx ..> bridge
+bridge --> llm
+capture --> disk
+
+@enduml

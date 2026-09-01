@@ -1,0 +1,166 @@
+@startuml
+' Schema de donnees du suivi de poids et de calories (miam v1).
+' Toutes les tables portent les colonnes d'audit (created_at/updated_at,
+' created_by/updated_by) via la macro auditColumns() de laraskel-core,
+' sauf la table users fournie par la brique Laraskel.
+
+hide methods
+hide circle
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class User <<brique Laraskel>> {
+  name
+  email
+  is_active
+  role (admin | utilisateur)
+}
+
+class Profile {
+  birthdate
+  sex
+  height_cm
+  start_weight_kg
+  start_date
+  activity_level
+  medical_constraints
+  allergies
+  food_preferences
+}
+
+class AcquiredHabitChange {
+  changed_on
+  description
+}
+
+class Goal <<historise>> {
+  effective_from
+  target_weight_kg
+  target_rate_kg_per_week
+  daily_calorie_budget
+  protein_target_g
+  indicative_target_date
+}
+
+class TrackingSettings {
+  review_interval_days
+  next_review_on
+}
+
+class WeighIn {
+  measured_on
+  weight_kg
+  body_fat_pct
+  muscle_mass_pct
+  note
+}
+
+class Meal {
+  eaten_at
+  moment
+  description
+  estimated_kcal
+  context_tag
+  note
+  photo_path
+}
+
+class MealItem {
+  label
+  quantity
+  unit
+  kcal
+}
+
+class ReferenceFood {
+  label
+  kcal_per_100
+  kcal_per_unit
+  unit_label
+}
+
+class Review {
+  reviewed_on
+  observed_slope_kg_per_week
+  target_slope_kg_per_week
+  decision
+  conclusion
+  next_review_on
+}
+
+class JournalEntry {
+  entered_on
+  body
+  weigh_in_count_7d
+  meal_count_7d
+}
+
+class HabitAnalysis {
+  body
+}
+
+class WeeklyMenu {
+  week_start
+}
+
+class MenuItem {
+  moment
+  description
+  indicative_kcal
+  is_free_meal
+}
+
+class SuspensionPeriod {
+  starts_on
+  ends_on
+  reason
+}
+
+class ImportBatch {
+  kind (poids | repas)
+  source_filename
+  imported_at
+  rows_total
+  rows_imported
+  rows_rejected
+}
+
+class ImportRejection {
+  line_no
+  raw
+  reason
+}
+
+User "1" -- "1" Profile
+User "1" -- "0..*" AcquiredHabitChange
+User "1" -- "1..*" Goal
+User "1" -- "1" TrackingSettings
+User "1" -- "0..*" WeighIn
+User "1" -- "0..*" Meal
+User "1" -- "0..*" ReferenceFood
+User "1" -- "0..*" Review
+User "1" -- "0..*" JournalEntry
+User "1" -- "1" HabitAnalysis
+User "1" -- "0..*" WeeklyMenu
+User "1" -- "0..*" SuspensionPeriod
+User "1" -- "0..*" ImportBatch
+
+Meal "1" -- "0..*" MealItem
+MealItem "0..*" -- "0..1" ReferenceFood
+WeeklyMenu "1" -- "1..*" MenuItem
+Review "1" -- "0..1" JournalEntry : consigne
+ImportBatch "1" -- "0..*" ImportRejection
+
+note bottom of ReferenceFood
+  Table propre a chaque utilisateur,
+  amorcee depuis calories_reference.md.
+end note
+
+note bottom of JournalEntry
+  Moyenne mobile 7 j, pente de poids,
+  IMC, budget restant : calcules a la
+  volee, jamais stockes.
+end note
+
+@enduml
