@@ -22,6 +22,10 @@ L'application affiche l'évolution du poids, de l'IMC et des apports caloriques,
 propose à intervalle régulier un bilan qui compare la perte réelle au rythme visé et
 suggère d'ajuster le budget.
 
+L'utilisateur peut également se faire assister pour analyser ses habitudes, tenir un journal de suivi, planifier des menus. Pour se faire il peut interagir avec l'assistant, qui adopte une posture de diététicien/nutritionniste et dispose du contexte de l'utilisateur (profil, objectifs, historique de pesées et de repas, table de référence calorique).
+
+L'assistant pourra également être interrogé pour évaluer les objectifs, les habitudes et les stratégies de perte de poids, mais il ne remplacera pas un suivi médical ou diététique professionnel. Il est recommandé de faire valider les objectifs et les ajustements proposés par l'assistant avec un professionnel de santé.
+
 miam reprend **les fonctionnalités** de `pdp` ; l'implémentation (application web
 multi-utilisateur bâtie sur Laraskel, données en base) est nouvelle.
 
@@ -65,6 +69,7 @@ visualisation graphique et l'interface LLM sont fournies par Laraskel. Ce PRD d�
 - `profile.md`, `goals.md`, `habits.md`, `journal.md` → structure des données de suivi ;
 - les trois graphiques (poids, IMC, calories/jour) → spécification des visualisations ;
 - `data/weight.csv` et `data/food.csv` → jeu de données d'amorçage (import).
+- On y ajoutera un suivi de pourcentage de masse graisseuse et de masse musculaire, si l'utilisateur dispose d'une balance qui le mesure.
 
 ## 3. Objectifs et métriques de succès
 
@@ -106,7 +111,7 @@ visualisation graphique et l'interface LLM sont fournies par Laraskel. Ce PRD d�
 - Import d'un historique (poids, repas).
 - Périodes de suspension du suivi.
 
-### 5.2 Exclu (v1, différé)
+### 5.2 Exclu
 
 - Multi-tenant, moteur de formulaires, calendrier/réservations, gestion documentaire,
   messagerie interne.
@@ -281,11 +286,11 @@ Description fonctionnelle, sans schéma de base.
 
 ## 9. Hypothèses et questions ouvertes
 
-- **Estimation LLM hors ligne** : l'estimation par photo suppose une connexion au moment du repas. Comportement attendu si l'utilisateur est hors ligne (file d'attente locale ? saisie texte de secours ?) — à préciser.
-- **Étalonnage** : `pdp` prévoit des pesées d'aliments ponctuelles pour étalonner les estimations. Faut-il un mode « repas pesé » explicite, ou l'utilisateur indique-t-il simplement les poids dans la description ?
+- **Estimation LLM hors ligne** : l'estimation par photo suppose une connexion au moment du repas. Comportement attendu si l'utilisateur est hors ligne (file d'attente locale ? saisie texte de secours ?) — L'application est servie en ligne, elle n'est pas fonctionnelle hors ligne.
+- **Étalonnage** : `pdp` prévoit des pesées d'aliments ponctuelles pour étalonner les estimations. Faut-il un mode « repas pesé » explicite, ou l'utilisateur indique-t-il simplement les poids dans la description ? En cas d'écart, l'utilisateur pourra corriger les quantités et l'assistant ajustera la table de référence.
 - **Facteur d'activité** : correspondance entre le « niveau d'activité » déclaré (texte libre dans `pdp`) et un facteur chiffré — liste de niveaux prédéfinis à définir.
-- **Confidentialité** : les photos d'assiette et le contexte de santé sont des données sensibles ; les exigences de conservation/suppression restent à cadrer.
-- **Multi-objectifs** : la v1 vise la perte de poids ; la stabilisation (maintien) après atteinte de la cible est-elle dans le périmètre v1 ou différée ?
+- **Confidentialité** : les photos d'assiette et le contexte de santé sont des données sensibles. Un utilisateur aura la possibilité d'effacer toutes ses données.
+- **Multi-objectifs** : la v1 vise la perte de poids ; la stabilisation (maintien) après atteinte de la cible est-elle dans le périmètre v1 ou différée ? Le maintien sera couvert sur les mêmes principes. Éventuellement, les apports caloriques journaliers seront ajustés pour maintenir le poids cible, et l'utilisateur pourra continuer à saisir ses repas et pesées pour suivre sa régularité et son équilibre alimentaire.
 
 ## 10. Références
 
