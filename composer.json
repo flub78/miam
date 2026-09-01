@@ -7,9 +7,16 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "flub78/laraskel-core": "@dev",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../laraskel/packages/*"
+        }
+    ],
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^2.7",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "157101d7faa15d2f546f87b9fa239bfd",
+    "content-hash": "5a8f582a6849d15c577cf96dca81d8a9",
     "packages": [
         {
             "name": "brick/math",
@@ -506,6 +506,46 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
+        },
+        {
+            "name": "flub78/laraskel-core",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "../laraskel/packages/core",
+                "reference": "a6ef925a1b9b48371482198fc35beffbb3415f48"
+            },
+            "require": {
+                "illuminate/database": "^13.0",
+                "illuminate/routing": "^13.0",
+                "illuminate/support": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laraskel\\Core\\CoreServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laraskel\\Core\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Laraskel — brique cœur : structure de base, conventions et macros de schéma partagées par les applications bâties sur Laraskel.",
+            "keywords": [
+                "laraskel",
+                "laravel",
+                "skeleton"
+            ],
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "fruitcake/php-cors",
@@ -8692,7 +8732,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "flub78/laraskel-core": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
