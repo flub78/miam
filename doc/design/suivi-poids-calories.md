@@ -192,7 +192,8 @@ Responsabilités :
 
 ## 8. Dépendances et ordonnancement
 
-L'ordre des lots (détaillé dans `doc/plans/`) découle des dépendances entre briques :
+L'ordre des lots (détaillé dans [`doc/plans/suivi-poids-calories.md`](../plans/suivi-poids-calories.md),
+avec les prérequis Laraskel de chaque lot) découle des dépendances entre briques :
 
 1. **Brique utilisateurs/rôles** (Laraskel) extraite et consommée → comptes, profil.
 2. **Objectifs + pesées + courbe de poids** — ne dépend que de `laraskel-core` et de la
