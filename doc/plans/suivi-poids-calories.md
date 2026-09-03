@@ -69,24 +69,35 @@ bloquant** et peut démarrer immédiatement.
 - [x] Consommer `flub78/laraskel-core` en path repository.
 - [x] Page d'accueil à la charte graphique.
 - [x] PRD et note de design (avec diagrammes) rédigés et commités.
-- [ ] Classe de base de test (`Tests\TestCase`) appliquant `DatabaseTransactions` ;
-      documenter le squelette de test « monte / nettoie ses données ».
-- [ ] Trait `App\Models\Concerns\AppartientAUtilisateur` : global scope sur
-      `user_id = Auth::id()`, affectation automatique à la création, exposition d'une
-      relation `user()`. Test unitaire dédié (deux utilisateurs, aucune fuite).
-- [ ] Politique d'autorisation générique du domaine (un utilisateur n'agit que sur ses
-      lignes) + enregistrement.
-- [ ] `bin/puml.sh` opérationnel (fait) ; `bin/puml.sh --check` intégré au réflexe de
-      commit documentation.
-- [ ] `doc/users/README.md` : sommaire de la documentation utilisateur, à compléter lot
+- [x] Classe de base de test (`Tests\TestCase`) : applique `RefreshDatabase` sur SQLite
+      en mémoire (aligné sur laraskel ; la règle `DatabaseTransactions` de
+      `.ai/rules/tests.md` ne vise que l'exécution contre une base partagée). Squelette
+      « monte / nettoie ses données » documenté dans le PHPDoc de `Tests\TestCase`.
+- [x] Trait `App\Models\Concerns\AppartientAUtilisateur` : global scope
+      `utilisateur_courant` sur `user_id = Auth::id()` (ne filtre pas hors contexte
+      authentifié), affectation automatique de `user_id` à la création, relation
+      `user()`. `AppartientAUtilisateurTest` (deux utilisateurs, aucune fuite).
+- [x] Politique d'autorisation générique : classe abstraite
+      `App\Policies\PolitiqueProprietaire` (un utilisateur n'agit que sur ses lignes).
+      Les policies concrètes l'étendent et sont associées à leur modèle par convention
+      de nommage (auto-découverte Laravel) — enregistrées avec chaque modèle du domaine
+      (Lot 1 et suivants). `PolitiqueProprietaireTest`.
+- [x] `bin/puml.sh` opérationnel ; `bin/puml.sh --check` ajouté au réflexe de commit
+      documentation (`.ai/rules/doc.md`).
+- [x] `doc/users/README.md` : sommaire de la documentation utilisateur, à compléter lot
       par lot.
+- [ ] _(ultérieur)_ Suite de tests minimale contre une base **persistante** (SQLite
+      fichier) : vérifier qu'au moins un test passe — la base est correctement installée
+      et configurée. Objectif de fumée, pas une reprise de toute la couverture par type
+      de base.
 
 **Tests.**
-- [ ] `AppartientAUtilisateurTest` — isolation stricte entre deux utilisateurs.
-- [ ] La suite existante (`LaraskelCoreTest`, `PageAccueilTest`) reste verte.
+- [x] `AppartientAUtilisateurTest` — isolation stricte entre deux utilisateurs.
+- [x] `PolitiqueProprietaireTest` — un utilisateur n'agit que sur ses lignes.
+- [x] La suite existante (`LaraskelCoreTest`, `PageAccueilTest`) reste verte.
 
 **Documentation utilisateur.**
-- [ ] `doc/users/README.md` (sommaire).
+- [x] `doc/users/README.md` (sommaire).
 
 ---
 
@@ -456,7 +467,7 @@ CU-6 (croisement bilan / contexte).
 
 | Lot | Périmètre | Prérequis Laraskel | État |
 |---|---|---|---|
-| 0 | Fondations miam (test, isolation, doc) | `laraskel-core` (fait) | En cours |
+| 0 | Fondations miam (test, isolation, doc) | `laraskel-core` (fait) | Fait (reste un test « base persistante » ultérieur) |
 | 1 | Comptes et profil | Brique users/rôles + Filament + `TracksAuthor` | **Bloqué** (brique à extraire) |
 | 2 | Objectifs, budget, pesées, courbes | Brique visualisation graphique | **Bloqué** (dépend Lot 1 + brique viz) |
 | 3 | Journal alimentaire + table de référence (manuel) | Stockage image (léger) | À faire (dépend Lot 1, 2) |

@@ -11,5 +11,5 @@ Ne créer un fichier de documentation que si l'utilisateur le demande explicitem
 - `plans/` : étapes d'implémentation pas à pas, organisées en lots de livraison avec cases à cocher ; mettre à jour le plan lui-même, pas de document de synthèse ou de todo à côté.
 - `design/` : architecture, minimaliste ; lister les alternatives écartées et pourquoi.
 - `users/` : orienté how-to.
-- Diagrammes PlantUML : sources `.puml` dans un sous-dossier `diagrams/` voisin du document ; régénérer les images avec `bin/puml.sh` et committer `.puml` + `.png` ensemble (la CI vérifie qu'ils changent dans le même diff).
+- Diagrammes PlantUML : sources `.puml` dans un sous-dossier `diagrams/` voisin du document ; régénérer les images avec `bin/puml.sh` et committer `.puml` + `.png` ensemble (la CI vérifie qu'ils changent dans le même diff). Réflexe avant tout commit touchant un `.puml` : lancer `bin/puml.sh --check` (échoue si une image est absente ou obsolète).
 - Quand un PRD, un design ou un plan change, mettre à jour les documents liés.
