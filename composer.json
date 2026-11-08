@@ -3,7 +3,11 @@
     "name": "flub78/miam",
     "type": "project",
     "description": "miam — application de suivi de poids et de calories, premier projet bati sur Laraskel.",
-    "keywords": ["laravel", "laraskel", "miam"],
+    "keywords": [
+        "laravel",
+        "laraskel",
+        "miam"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.3",
@@ -19,10 +23,12 @@
     ],
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "flub78/laraskel-dev": "@dev",
+        "larastan/larastan": "^3.14",
         "laravel/boost": "^2.7",
         "laravel/pail": "^1.2.5",
         "laravel/pao": "^1.0.6",
-        "laravel/pint": "^1.27",
+        "laravel/pint": "^1.32",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "phpunit/phpunit": "^12.5.12"
@@ -73,6 +79,36 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "lint": [
+            "@php vendor/bin/pint --test"
+        ],
+        "lint:fix": [
+            "@php vendor/bin/pint"
+        ],
+        "analyse": [
+            "@putenv PHPSTAN_TURBO=0",
+            "@php vendor/bin/phpstan analyse --memory-limit=1G"
+        ],
+        "test:ci": [
+            "@php artisan config:clear --ansi @no_additional_args",
+            "@php artisan test --testsuite=Unit,Feature"
+        ],
+        "test:coverage": [
+            "vendor/bin/laraskel-coverage"
+        ],
+        "qa": [
+            "@lint",
+            "@analyse",
+            "@test:ci"
+        ],
+        "qa:fix": [
+            "@lint:fix",
+            "@analyse",
+            "@test:ci"
+        ],
+        "qa:report": [
+            "vendor/bin/laraskel-qa"
         ]
     },
     "extra": {

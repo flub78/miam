@@ -12,10 +12,10 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
  * rejoue les migrations à neuf une fois, puis enveloppe chaque test dans une
  * transaction annulée à la fin : aucune donnée ne survit d'un test à l'autre.
  *
- * La règle « utiliser `DatabaseTransactions`, pas `RefreshDatabase` » de
- * `.ai/rules/tests.md` ne vise que l'exécution **contre une base partagée** (copie
- * de production). Elle ne s'applique pas ici, où la base est jetable et recréée à
- * chaque exécution.
+ * La règle commune Laraskel « utiliser `DatabaseTransactions`, pas `RefreshDatabase` »
+ * ne vise que l'exécution **contre une base partagée** (copie de production). Elle ne
+ * s'applique pas ici, où la base est jetable et recréée à chaque exécution (écart
+ * assumé, voir `CLAUDE.md`).
  *
  * Squelette d'un test qui « monte et nettoie ses données » :
  * - créer les lignes nécessaires via les factories, dans le test ou `setUp()` ;

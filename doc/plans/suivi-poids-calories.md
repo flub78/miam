@@ -28,12 +28,12 @@ développement du socle.
 
 ### 1.1 Dépendances Laraskel — vue d'ensemble
 
-| Brique Laraskel | Requise par | État au 2026-09-02 | Nature |
+| Brique Laraskel | Requise par | État au 2026-11-08 | Nature |
 |---|---|---|---|
 | `laraskel-core` (macros d'audit, conventions, page de santé) | tous les lots | **Disponible**, consommée en path repository | — |
-| Trait `TracksAuthor` (`created_by` / `updated_by` depuis `Auth::id()`) | Lot 1 → 5 | À livrer (dans `laraskel-core` ou la brique users) | **Bloquant Lot 1** |
-| **Gestion utilisateurs + rôles** (Fortify, `spatie/permission`, modèle `User` extensible, panel Filament d'administration, cycle de vie des comptes) | Lot 1 | Existe dans `laraskel/app/`, **pas encore packagée**. Découpage (`laraskel-users` dédié vs intégré à `laraskel-core`) = décision Laraskel (`todo.md` §2 priorité 2) | **Bloquant Lot 1** |
-| Socle Filament (panels, installation, thème charte) | Lot 1 → 5 | Fourni avec la brique users/rôles ou à installer dans miam — à trancher côté Laraskel | **Bloquant Lot 1** |
+| Trait `TracksAuthor` (`created_by` / `updated_by` depuis `Auth::id()`) | Lot 1 → 5 | **Disponible** : `Laraskel\Users\Models\Concerns\TracksAuthor` (brique `laraskel-users`) | — |
+| **Gestion utilisateurs + rôles** (Fortify, `spatie/permission`, modèle `User` extensible, panel Filament d'administration, cycle de vie des comptes) | Lot 1 | **Disponible** : package dédié `flub78/laraskel-users` (`laraskel/doc/plans/socle-auth-roles.md`) | — |
+| Socle Filament (panels, installation, thème charte) | Lot 1 → 5 | **Tranché** : Filament et le panel d'administration viennent de la brique users ; le **panel utilisateur** est créé dans miam (la brique n'en fournit pas) | — |
 | **Visualisation graphique** (widgets de graphiques Filament / Chart.js, sélecteur de période) | Lot 2 | À extraire (`todo.md` §2 priorité 4, `README.md` §7) | **Bloquant Lot 2** |
 | **Stockage d'image** — disque privé + URL signée (sous-ensemble minimal, pas la médiathèque) | Lot 3 | Réalisable sans brique avec `Storage` natif (§ Lot 3, option A) ; brique optionnelle si extraite d'ici là | Léger |
 | **Pont LLM** (`llm-bridge` : Prism, entrée image, prompts, journalisation, coûts) | Lot 4 | À extraire (`todo.md` §2 priorité 5) — module le moins mûr, `prds/interface-llm.md` est un squelette | **Bloquant Lot 4** |
@@ -82,8 +82,8 @@ bloquant** et peut démarrer immédiatement.
       Les policies concrètes l'étendent et sont associées à leur modèle par convention
       de nommage (auto-découverte Laravel) — enregistrées avec chaque modèle du domaine
       (Lot 1 et suivants). `PolitiqueProprietaireTest`.
-- [x] `bin/puml.sh` opérationnel ; `bin/puml.sh --check` ajouté au réflexe de commit
-      documentation (`.ai/rules/doc.md`).
+- [x] Régénération des diagrammes opérationnelle (`vendor/bin/laraskel-puml`, brique
+      `laraskel-dev`) ; `--check` ajouté au réflexe de commit documentation (`CLAUDE.md`).
 - [x] `doc/users/README.md` : sommaire de la documentation utilisateur, à compléter lot
       par lot.
 - [ ] _(ultérieur)_ Suite de tests minimale contre une base **persistante** (SQLite
@@ -108,21 +108,30 @@ passe, renseigne son profil et l'historique de ses changements d'habitudes acqui
 
 **Couvre.** FR-1, FR-2, FR-3, FR-4, FR-5. Début de CU-5.
 
-**Dépendances Laraskel — BLOQUANTES.**
+**Dépendances Laraskel — disponibles** (brique `flub78/laraskel-users`, mode d'emploi :
+`laraskel/doc/development/guide-application-derivee.md` § « Consommer la brique users »).
 
-| À livrer par Laraskel | Détail attendu |
+| Attendu de Laraskel | Détail attendu |
 |---|---|
 | Brique **gestion utilisateurs + rôles** en package | Modèle `User` de base **extensible par composition** ; Fortify (connexion, mot de passe oublié, lien de première connexion) ; `spatie/laravel-permission` avec rôles plats `admin` / `utilisateur` ; panel Filament d'administration des comptes (création, activation / désactivation, déclenchement d'une réinitialisation) ; commande de création d'un administrateur. |
 | Décision de découpage | `laraskel-users` dédié **ou** intégration à `laraskel-core` (décision Laraskel, `todo.md` §2). miam s'adapte au nom de package retenu. |
 | Socle Filament | Installation, configuration d'un **panel utilisateur** (distinct du panel d'administration), thème aligné sur la charte. Fourni par la brique ou à installer dans miam — à trancher côté Laraskel. |
 | Trait `TracksAuthor` | Remplissage `created_by` / `updated_by` depuis `Auth::id()` (annoncé par `.ai/rules/migrations.md` comme fourni par le package cœur). |
 
-> Tant que ces éléments ne sont pas consommables via `composer require`, le Lot 1 ne peut
-> être ni terminé ni validé. Les étapes miam ci-dessous se préparent, mais leur test
-> d'intégration dépend de la brique.
+> Écarts entre l'attendu et la brique livrée, à traiter au démarrage du lot :
+> - rôles : la brique crée `admin` / `user` (pas `utilisateur`) ; publier
+>   `config/authorization.php` pour ajuster le catalogue ;
+> - inscription libre : active par défaut dans la brique ; miam (comptes créés par
+>   l'administrateur) publie `config/laraskel-users.php` et retire
+>   `Features::registration()` de `fortify.features`. Ne pas publier `config/fortify.php`
+>   (la brique fixe alors elle-même les réglages Fortify).
+>
+> Le parcours « l'administrateur crée le compte sans mot de passe, le titulaire reçoit un
+> lien » et l'action « Envoyer un lien de mot de passe » sont fournis par la brique
+> (Lot 6 de `laraskel/doc/plans/socle-auth-roles.md`).
 
 **Étapes.**
-- [ ] `composer require` de la brique users/rôles (nom selon décision Laraskel) ;
+- [ ] `composer require flub78/laraskel-users:@dev` ;
       vérifier l'auto-découverte (`php artisan about`, panels visibles).
 - [ ] `App\Models\User` **étend** le `User` de la brique (composition) ; y accrocher les
       relations du domaine (ajoutées au fil des lots) et le rôle `utilisateur` par
@@ -326,9 +335,10 @@ opération, dialogue de coaching contextuel, proposition de menus.
 **Couvre.** FR-15, FR-16, FR-21, FR-25 (réutilisation par l'assistant), FR-44 à FR-46,
 FR-49, FR-52 à FR-55. CU-1, CU-6 (préparation).
 
-**Dépendances Laraskel — BLOQUANTES.**
+**Dépendances Laraskel — disponibles** (brique `flub78/laraskel-users`, mode d'emploi :
+`laraskel/doc/development/guide-application-derivee.md` § « Consommer la brique users »).
 
-| À livrer par Laraskel | Détail attendu |
+| Attendu de Laraskel | Détail attendu |
 |---|---|
 | Brique **`llm-bridge`** en package | Wrapper Prism : appels multi-provider, **entrée image** (photo d'assiette), prompts internes, journalisation des échanges, suivi des coûts, gestion d'erreur exploitable par l'appelant (pour le mode dégradé). |
 | Spécification | `laraskel/doc/prds/interface-llm.md` est aujourd'hui un squelette (`todo.md` §2 priorité 5) : la brique est **le module le plus à spécifier**. Ce lot est le plus exposé au calendrier Laraskel. |
@@ -468,7 +478,7 @@ CU-6 (croisement bilan / contexte).
 | Lot | Périmètre | Prérequis Laraskel | État |
 |---|---|---|---|
 | 0 | Fondations miam (test, isolation, doc) | `laraskel-core` (fait) | Fait (reste un test « base persistante » ultérieur) |
-| 1 | Comptes et profil | Brique users/rôles + Filament + `TracksAuthor` | **Bloqué** (brique à extraire) |
+| 1 | Comptes et profil | Brique users/rôles + Filament + `TracksAuthor` | **À faire** (brique disponible) |
 | 2 | Objectifs, budget, pesées, courbes | Brique visualisation graphique | **Bloqué** (dépend Lot 1 + brique viz) |
 | 3 | Journal alimentaire + table de référence (manuel) | Stockage image (léger) | À faire (dépend Lot 1, 2) |
 | 4 | Assistant : estimation, coaching, menus | Brique `llm-bridge` | **Bloqué** (brique à extraire et à spécifier) |

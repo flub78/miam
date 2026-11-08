@@ -1,0 +1,14 @@
+# Surcouche locale de phpstan.neon.dist (gabarit flub78/laraskel-dev, laissé intact
+# pour que « php artisan laraskel:outillage --check » reste conforme). PHPStan lit
+# ce fichier en priorité. Écart assumé, voir CLAUDE.md.
+includes:
+    - phpstan.neon.dist
+
+parameters:
+    excludePaths:
+        analyse:
+            # Un trait utilisé zéro fois n'est pas analysable (règle `trait.unused`).
+            # `AppartientAUtilisateur` n'a pas encore de modèle consommateur (Lot 1 et
+            # suivants) ; il est couvert par tests/Feature/AppartientAUtilisateurTest.php.
+            # Retirer cette exclusion dès que le premier modèle du domaine l'utilise.
+            - app/Models/Concerns/AppartientAUtilisateur.php
