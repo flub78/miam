@@ -20,9 +20,9 @@ package "miam" {
 
 package "Briques Laraskel (packages Composer)" {
   component "laraskel-core\n(macros d'audit, conventions)" as core
-  component "gestion utilisateurs + roles\n(Fortify, spatie/permission,\npanel Filament)" as users
-  component "visualisation graphique\n(widgets Filament / ApexCharts)" as dataviz
-  component "llm-bridge\n(Prism : appels, prompts,\nlogs, couts)" as bridge
+  component "laraskel-users\n(Fortify, spatie/permission,\npanel d'administration)" as users
+  component "laraskel-charts\n(widgets graphiques Filament / Chart.js)" as dataviz
+  component "laraskel-llm\n(Prism : appels, gabarits,\njournal, couts)" as bridge
 }
 
 cloud "Fournisseur LLM" as llm

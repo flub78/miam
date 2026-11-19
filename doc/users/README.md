@@ -9,10 +9,10 @@ ci-dessous s'étoffe lot par lot.
 
 ## Sommaire
 
-### Comptes et profil — _Lot 1, à venir_
+### Comptes et profil
 
-- `comptes.md` — première connexion, rôle de l'administrateur
-- `profil.md` — renseigner son profil, changements d'habitudes
+- [Comptes](comptes.md) — première connexion, mot de passe oublié, rôle de l'administrateur
+- [Profil](profil.md) — renseigner son profil, changements d'habitudes
 
 ### Objectifs, pesées et courbes — _Lot 2, à venir_
 

@@ -21,10 +21,6 @@ smartphone, premier projet bâti sur Laraskel (`../laraskel`). Voir le
   (« contre une base partagée : `DatabaseTransactions` ») vise l'exécution sur une copie
   de production, qui ne concerne pas cette suite ; un test lancé contre une base
   persistante doit, lui, la respecter.
-- **Qualité — exclusion PHPStan temporaire.** `phpstan.neon` (surcouche de
-  `phpstan.neon.dist`, laissé conforme au gabarit) exclut le trait
-  `App\Models\Concerns\AppartientAUtilisateur`, inanalysable tant qu'aucun modèle ne
-  l'utilise (`trait.unused`). À retirer avec le premier modèle du domaine (Lot 1).
 
 ## Spécificités
 

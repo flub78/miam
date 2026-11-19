@@ -28,15 +28,15 @@ développement du socle.
 
 ### 1.1 Dépendances Laraskel — vue d'ensemble
 
-| Brique Laraskel | Requise par | État au 2026-11-08 | Nature |
+| Brique Laraskel | Requise par | État au 2026-11-19 | Nature |
 |---|---|---|---|
 | `laraskel-core` (macros d'audit, conventions, page de santé) | tous les lots | **Disponible**, consommée en path repository | — |
 | Trait `TracksAuthor` (`created_by` / `updated_by` depuis `Auth::id()`) | Lot 1 → 5 | **Disponible** : `Laraskel\Users\Models\Concerns\TracksAuthor` (brique `laraskel-users`) | — |
 | **Gestion utilisateurs + rôles** (Fortify, `spatie/permission`, modèle `User` extensible, panel Filament d'administration, cycle de vie des comptes) | Lot 1 | **Disponible** : package dédié `flub78/laraskel-users` (`laraskel/doc/plans/socle-auth-roles.md`) | — |
 | Socle Filament (panels, installation, thème charte) | Lot 1 → 5 | **Tranché** : Filament et le panel d'administration viennent de la brique users ; le **panel utilisateur** est créé dans miam (la brique n'en fournit pas) | — |
-| **Visualisation graphique** (widgets de graphiques Filament / Chart.js, sélecteur de période) | Lot 2 | À extraire (`todo.md` §2 priorité 4, `README.md` §7) | **Bloquant Lot 2** |
+| **Visualisation graphique** (widgets de graphiques Filament / Chart.js, sélecteur de période) | Lot 2 | **Disponible** (Lot 1) : `flub78/laraskel-charts` (`laraskel/doc/plans/brique-graphiques.md`). Bandes de zones IMC à ajouter (Lot 2 de la brique) | Léger (complément) |
 | **Stockage d'image** — disque privé + URL signée (sous-ensemble minimal, pas la médiathèque) | Lot 3 | Réalisable sans brique avec `Storage` natif (§ Lot 3, option A) ; brique optionnelle si extraite d'ici là | Léger |
-| **Pont LLM** (`llm-bridge` : Prism, entrée image, prompts, journalisation, coûts) | Lot 4 | À extraire (`todo.md` §2 priorité 5) — module le moins mûr, `prds/interface-llm.md` est un squelette | **Bloquant Lot 4** |
+| **Pont LLM** (Prism, entrée image, prompts, journalisation, coûts) | Lot 4 | **Disponible** (Lot 1) : `flub78/laraskel-llm` (`laraskel/doc/plans/brique-llm.md`) — plafonds de coûts et données sensibles à venir (Lots 2–3 de la brique) | Léger (compléments) |
 | Signalement à la connexion (bannière « bilan dû ») | Lot 5 | Réalisable dans miam (contrôle au login + notification Filament) ; s'aligner sur `prds/navigation-dashboards.md` si un mécanisme générique arrive | Léger |
 
 ### 1.2 Conventions d'implémentation (rappel)
@@ -131,44 +131,61 @@ passe, renseigne son profil et l'historique de ses changements d'habitudes acqui
 > (Lot 6 de `laraskel/doc/plans/socle-auth-roles.md`).
 
 **Étapes.**
-- [ ] `composer require flub78/laraskel-users:@dev` ;
+- [x] `composer require flub78/laraskel-users:@dev` ;
       vérifier l'auto-découverte (`php artisan about`, panels visibles).
-- [ ] `App\Models\User` **étend** le `User` de la brique (composition) ; y accrocher les
+- [x] `App\Models\User` **étend** le `User` de la brique (composition) ; y accrocher les
       relations du domaine (ajoutées au fil des lots) et le rôle `utilisateur` par
       défaut à la création.
-- [ ] Migration `profiles` : `user_id` unique, `birthdate`, `sex`, `height_cm`,
+- [x] Migration `profiles` : `user_id` unique, `birthdate`, `sex`, `height_cm`,
       `start_weight_kg`, `start_date`, `activity_level` (enum), `medical_constraints`,
       `allergies`, `food_preferences` + `auditColumns()`.
-- [ ] Migration `acquired_habit_changes` : `user_id`, `changed_on`, `description` +
+- [x] Migration `acquired_habit_changes` : `user_id`, `changed_on`, `description` +
       `auditColumns()`.
-- [ ] Modèles `Profile`, `AcquiredHabitChange` avec `AppartientAUtilisateur`, casts,
+- [x] Modèles `Profile`, `AcquiredHabitChange` avec `AppartientAUtilisateur`, casts,
       factories.
-- [ ] Enum `App\Enums\ActivityLevel` — échelle fermée de niveaux. **Options de barème**
+- [x] Enum `App\Enums\ActivityLevel` — échelle fermée de niveaux. **Options de barème**
       (à confirmer, cf. PRD §9) :
       - sédentaire 1,2 · léger 1,375 · modéré 1,55 · soutenu 1,725 · intense 1,9
         (barème Harris-Benedict classique, **retenu par défaut**) ;
       - variante à 4 niveaux (1,2 / 1,375 / 1,55 / 1,725) si « intense » n'est pas utile.
       Le profil stocke le **niveau**, pas le facteur.
-- [ ] *Resource* Filament « Profil » (panel utilisateur) : formulaire, `height_cm` et
+- [x] Page Filament « Mon profil » (panel utilisateur) : formulaire, `height_cm` et
       `birthdate` requis (nécessaires au budget), reste optionnel ; message explicite si
       un champ requis manque.
-- [ ] *Resource* / section « Changements d'habitudes acquis » : liste + création.
-- [ ] Vérifier l'isolation : un utilisateur ne voit jamais le profil d'un autre ;
+- [x] *Resource* « Changements d'habitudes acquis » : liste + création.
+- [x] Vérifier l'isolation : un utilisateur ne voit jamais le profil d'un autre ;
       l'administrateur non plus (FR-5).
 
+**Réalisation (2026-11-19).**
+- Barème `ActivityLevel` : 5 niveaux (option par défaut) ; enum `Sex` ajoutée pour
+  Mifflin-St Jeor (Lot 2).
+- Rôle : on garde `user` (nom de la brique), attribué à tout compte créé sans rôle. Le
+  formulaire d'administration de la brique resynchronise les rôles saisis : laissé vide,
+  il retire `user`. L'administrateur choisit donc le rôle ; une valeur par défaut du
+  champ serait une évolution de `laraskel-users` (à proposer côté Laraskel).
+- Inscription libre retirée (`config/laraskel-users.php` publié seul) ; retour après
+  connexion sur `/app`.
+- Panel utilisateur `app` (`/app`, panel par défaut) **sans page de connexion Filament** :
+  l'écran de connexion est celui de Fortify (brique), qui refuse un compte désactivé avec
+  un message explicite ; l'écran Filament n'affiche qu'un refus générique.
+- Profil = **page** d'édition de l'unique profil (créé au premier enregistrement) plutôt
+  qu'une *Resource* (liste inutile pour une ligne unique).
+- Traductions Laravel `lang/fr` reprises de Laraskel (messages de validation en français).
+- Exclusion PHPStan provisoire et surcouche `phpstan.neon` retirées.
+
 **Tests.**
-- [ ] Feature : création de compte par l'administrateur → l'utilisateur définit son mot
+- [x] Feature : création de compte par l'administrateur → l'utilisateur définit son mot
       de passe → connexion au panel utilisateur.
-- [ ] Feature : désactivation d'un compte → connexion refusée avec message ;
+- [x] Feature : désactivation d'un compte → connexion refusée avec message ;
       réactivation → connexion rétablie.
-- [ ] Feature : CRUD du profil ; champs requis manquants → message descriptif.
-- [ ] Feature : isolation profil / changements d'habitudes entre deux utilisateurs et
+- [x] Feature : CRUD du profil ; champs requis manquants → message descriptif.
+- [x] Feature : isolation profil / changements d'habitudes entre deux utilisateurs et
       vis-à-vis de l'administrateur.
-- [ ] Unitaire : `ActivityLevel` — libellés et facteurs.
+- [x] Unitaire : `ActivityLevel` — libellés et facteurs.
 
 **Documentation utilisateur.**
-- [ ] `doc/users/comptes.md` — première connexion, rôle de l'administrateur.
-- [ ] `doc/users/profil.md` — renseigner son profil, changements d'habitudes.
+- [x] `doc/users/comptes.md` — première connexion, rôle de l'administrateur.
+- [x] `doc/users/profil.md` — renseigner son profil, changements d'habitudes.
 
 ---
 
@@ -179,15 +196,13 @@ et lit l'évolution de son poids et de son IMC.
 
 **Couvre.** FR-6 à FR-14, FR-28, FR-29, FR-32 à FR-36, FR-59 à FR-61. CU-2, CU-4.
 
-**Dépendances Laraskel.**
+**Dépendances Laraskel — disponibles** (brique `flub78/laraskel-charts`, mode d'emploi :
+`laraskel/doc/development/guide-application-derivee.md` § « Consommer la brique
+graphiques » ; démo `/admin/demo/graphiques` en mode démo).
 
-| À livrer par Laraskel | Nature |
+| Fourni par la brique (Lot 1) | Reste à ajouter à la brique (son Lot 2) |
 |---|---|
-| **Brique visualisation graphique** : widgets de graphiques Filament (courbes, barres), lignes de repère, bandes colorées, sélecteur de période, rendu lisible sur smartphone | **Bloquant** pour FR-28 à FR-36 (les courbes). Le reste du lot — objectifs, budget, pesées, calculs — ne dépend que du Lot 1. |
-
-> Repli possible si la brique tarde : livrer d'abord les données et les services
-> (`WeightTrend`, `Bmi`) avec leurs tests, et un rendu tabulaire ; brancher les widgets
-> dès que la brique est disponible. À arbitrer avec l'utilisateur.
+| Widget abstrait `Graphique` : courbe, barres, aire, secteurs, jauge ; séries en pointillés (objectif, budget) ; couleurs par point (écart au budget) ; sélecteur de période 4 sem. / 3 mois / 12 mois / tout ; états vide et erreur ; permission | Bandes de zones colorées (IMC OMS, FR-29) ; infobulle avec unité (FR-34) ; rafraîchissement après écriture (FR-32). À traiter dans `laraskel` au démarrage de ce lot. |
 
 **Étapes — objectifs et budget.**
 - [ ] Migration `goals` (historisée) : `user_id`, `effective_from`, `target_weight_kg`,
@@ -335,19 +350,18 @@ opération, dialogue de coaching contextuel, proposition de menus.
 **Couvre.** FR-15, FR-16, FR-21, FR-25 (réutilisation par l'assistant), FR-44 à FR-46,
 FR-49, FR-52 à FR-55. CU-1, CU-6 (préparation).
 
-**Dépendances Laraskel — disponibles** (brique `flub78/laraskel-users`, mode d'emploi :
-`laraskel/doc/development/guide-application-derivee.md` § « Consommer la brique users »).
+**Dépendances Laraskel — disponibles** (brique `flub78/laraskel-llm`, mode d'emploi :
+`laraskel/doc/development/guide-application-derivee.md` § « Consommer la brique LLM » ;
+configuration : `laraskel/doc/users/assistant-llm.md`).
 
-| Attendu de Laraskel | Détail attendu |
+| Fourni par la brique (Lot 1) | Reste à ajouter à la brique |
 |---|---|
-| Brique **`llm-bridge`** en package | Wrapper Prism : appels multi-provider, **entrée image** (photo d'assiette), prompts internes, journalisation des échanges, suivi des coûts, gestion d'erreur exploitable par l'appelant (pour le mode dégradé). |
-| Spécification | `laraskel/doc/prds/interface-llm.md` est aujourd'hui un squelette (`todo.md` §2 priorité 5) : la brique est **le module le plus à spécifier**. Ce lot est le plus exposé au calendrier Laraskel. |
+| `Assistant::pour()` : gabarits Blade, **entrée image**, sortie structurée, journal `llm_echanges`, coût estimé, `EchecLlm` au message exploitable (mode dégradé), fournisseur `simulation` sans réseau | Plafonds de dépense et limites de débit (son Lot 2), fournisseur de repli et données sensibles (son Lot 3). |
 
-> Le Lot 4 ne démarre réellement que lorsque `llm-bridge` est consommable. En attendant,
-> le Lot 3 garantit un chemin manuel complet : miam reste utilisable sans assistant.
+> Le Lot 3 garantit un chemin manuel complet : miam reste utilisable sans assistant.
 
 **Étapes.**
-- [ ] `composer require flub78/llm-bridge` ; configuration du provider et des clés en
+- [ ] `composer require flub78/laraskel-llm:@dev` ; configuration du provider et des clés en
       `.env` ; vérifier un appel texte et un appel image de bout en bout.
 - [ ] `App\Assistant\AssistantContext` : sérialise profil, objectif courant + historique,
       N dernières pesées, N derniers repas, table de référence, analyse des habitudes,
@@ -478,8 +492,8 @@ CU-6 (croisement bilan / contexte).
 | Lot | Périmètre | Prérequis Laraskel | État |
 |---|---|---|---|
 | 0 | Fondations miam (test, isolation, doc) | `laraskel-core` (fait) | Fait (reste un test « base persistante » ultérieur) |
-| 1 | Comptes et profil | Brique users/rôles + Filament + `TracksAuthor` | **À faire** (brique disponible) |
-| 2 | Objectifs, budget, pesées, courbes | Brique visualisation graphique | **Bloqué** (dépend Lot 1 + brique viz) |
+| 1 | Comptes et profil | Brique users/rôles + Filament + `TracksAuthor` | **Fait** (2026-11-19) |
+| 2 | Objectifs, budget, pesées, courbes | Brique visualisation graphique | **À faire** (brique disponible ; bandes IMC à compléter) |
 | 3 | Journal alimentaire + table de référence (manuel) | Stockage image (léger) | À faire (dépend Lot 1, 2) |
-| 4 | Assistant : estimation, coaching, menus | Brique `llm-bridge` | **Bloqué** (brique à extraire et à spécifier) |
+| 4 | Assistant : estimation, coaching, menus | Brique `laraskel-llm` | À faire (brique disponible, Lot 1 ; dépend Lot 3) |
 | 5 | Bilan, journal, régularité, import | Signalement connexion (léger) | À faire (dépend Lot 2, 3) |

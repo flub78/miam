@@ -34,22 +34,26 @@ code.
 | Brique | Rôle dans miam | État |
 |---|---|---|
 | `laraskel-core` | Macros de schéma `auditColumns()`, conventions | **Consommée** (path repository) |
-| **gestion utilisateurs + rôles** | Comptes créés par l'administrateur, rôles plats `admin` / `utilisateur`, désactivation/réactivation, réinitialisation de mot de passe, panel d'administration Filament (FR-1, FR-2) | **Pas encore extraite en package** → §2.1 |
-| **visualisation graphique** | Courbes poids / IMC / calories, vue budget hebdomadaire (FR-28→FR-36) | À extraire (Laraskel `README` §7) |
-| **pont LLM** (`llm-bridge`) | Estimation calorique texte + photo, assistant de coaching (FR-15, FR-16, FR-44→FR-46) | À extraire (Laraskel `prds/interface-llm.md`) |
+| `laraskel-users` | Comptes créés par l'administrateur, rôles plats `admin` / `user`, désactivation/réactivation, réinitialisation de mot de passe, panel d'administration Filament (FR-1, FR-2) | **Consommée** (Lot 1) → §2.1 |
+| `laraskel-charts` | Courbes poids / IMC / calories, vue budget hebdomadaire (FR-28→FR-36) | **Disponible** (Laraskel `design/brique-graphiques.md`) |
+| `laraskel-llm` | Estimation calorique texte + photo, assistant de coaching (FR-15, FR-16, FR-44→FR-46) | **Disponible** (Laraskel `design/brique-llm.md`) |
 | **stockage d'image** | Photo attachée à un repas (FR-19) — **pas** la médiathèque complète (PRD §5.2) | Sous-ensemble minimal, cf. §7 |
 
-### 2.1 Dépendance bloquante — la brique utilisateurs/rôles
+### 2.1 La brique utilisateurs/rôles
 
-miam n'a aucune fonction utile sans comptes. Cette brique existe dans `laraskel/app/`
-(Fortify + `spatie/laravel-permission` + modèle `User` + panel Filament, cf.
-`socle-auth-roles.md`) mais **n'est pas encore un package Composer**.
+miam n'a aucune fonction utile sans comptes. Laraskel a extrait cette brique en package
+dédié `flub78/laraskel-users` (Fortify + `spatie/laravel-permission` + modèle `User` +
+panel d'administration Filament, cf. `socle-auth-roles.md`).
 
-**Retenu.** Son extraction est un préalable au premier lot fonctionnel de miam. Le
-découpage (package dédié `laraskel-users` ou intégration à `laraskel-core`) est une
-décision **côté Laraskel** (cf. sa priorisation `doc/todo.md` §2) ; miam se contente de
-la `require` et d'**étendre `User` par composition** (`class User extends
-Laraskel\...\User`) pour y accrocher les relations du domaine (§3).
+**Retenu.** miam la `require` et **étend `User` par composition** (`class User extends
+Laraskel\Users\Models\User`) pour y accrocher les relations du domaine (§3), le rôle
+`user` par défaut et l'accès au panel utilisateur (tout compte actif).
+
+**Connexion.** Le panel utilisateur n'a pas de page de connexion Filament : un visiteur
+non authentifié est renvoyé vers l'écran Fortify de la brique, qui refuse un compte
+désactivé avec un message explicite. L'alternative, la page de connexion Filament du
+panel, est écartée : elle ne donne qu'un refus générique (« identifiants invalides »)
+pour un compte désactivé.
 
 ### Alternatives écartées
 
@@ -122,7 +126,7 @@ portée par une énumération `ActivityLevel` ; le profil stocke le niveau, pas 
 
 ## 5. Frontière avec l'assistant (LLM)
 
-Toute interaction avec un modèle passe par la brique **`llm-bridge`** (Prism) : appels
+Toute interaction avec un modèle passe par la brique **`laraskel-llm`** (Prism) : appels
 multi-provider, prompts internes, journalisation, coûts. miam **ne parle jamais
 directement à un fournisseur**.
 
@@ -151,8 +155,8 @@ l'utilisateur saisir manuellement les calories d'un repas (jamais d'échec silen
 
 **Retenu.** miam est une **application Filament** : un panel d'administration (fourni par
 la brique utilisateurs/rôles) et un **panel utilisateur** pour le suivi. Les écrans
-courants (profil, objectifs, pesées, repas, table de référence, bilans, menus, journal)
-sont des *resources* Filament ; le parcours de saisie d'un repas depuis le smartphone
+courants (objectifs, pesées, repas, table de référence, bilans, menus, journal) sont des
+*resources* Filament, le profil (une ligne par utilisateur) une page d'édition ; le parcours de saisie d'un repas depuis le smartphone
 (CU-1 : photo → estimation → ajustement en une opération) et le bilan périodique (CU-3)
 sont des **pages Filament dédiées**. Les visualisations sont des **widgets graphiques**
 (brique visualisation).
