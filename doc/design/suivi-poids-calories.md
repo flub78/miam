@@ -120,6 +120,19 @@ matérialisée.
 | Budget restant du jour (FR-17), budget hebdomadaire (FR-31) | `DailyBalance` | objectif courant, repas de la période |
 | Régularité de saisie, détection de baisse (FR-51) | `LoggingRegularity` | pesées, repas, suspensions |
 
+Choix retenus au Lot 2 :
+
+- **Déficit** = rythme visé × 7 700 kcal/kg ÷ 7. **Plancher** du budget proposé :
+  1 200 kcal (femme) / 1 500 kcal (homme), signalé à l'écran. Écartés : pas de plancher
+  (un rythme élevé proposerait un budget dangereux) ; plancher = métabolisme de base
+  (trop variable d'un profil à l'autre pour une règle de prudence).
+- **Tendance** : moyenne journalière des pesées, moyenne mobile sur les 7 derniers jours
+  pesés hors suspension, pente par régression linéaire sur cette moyenne (jours pesés
+  hors suspension).
+- **Suspensions dans les courbes (FR-36)** : points de pesée grisés, moyenne mobile
+  continue. Écartés : zone verticale grisée (demande une extension de la brique
+  graphiques, réévaluable) ; courbe coupée pendant la suspension (rupture trompeuse).
+
 Le **facteur d'activité** (PRD §9, à définir) est une échelle fermée de niveaux
 (p. ex. sédentaire 1,2 · léger 1,375 · modéré 1,55 · soutenu 1,725 · intense 1,9),
 portée par une énumération `ActivityLevel` ; le profil stocke le niveau, pas le facteur.

@@ -68,6 +68,38 @@ class User extends BaseUser
         return $this->hasMany(AcquiredHabitChange::class);
     }
 
+    /**
+     * @return HasMany<Goal, $this>
+     */
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    /**
+     * @return HasOne<TrackingSettings, $this>
+     */
+    public function trackingSettings(): HasOne
+    {
+        return $this->hasOne(TrackingSettings::class);
+    }
+
+    /**
+     * @return HasMany<WeighIn, $this>
+     */
+    public function weighIns(): HasMany
+    {
+        return $this->hasMany(WeighIn::class);
+    }
+
+    /**
+     * @return HasMany<SuspensionPeriod, $this>
+     */
+    public function suspensionPeriods(): HasMany
+    {
+        return $this->hasMany(SuspensionPeriod::class);
+    }
+
     protected static function newFactory(): Factory
     {
         return UserFactory::new();
