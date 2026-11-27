@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "40cb1e95b4942e689f9a8e0f903a2c0a",
+    "content-hash": "784000d8e55ed0a326c5f93f161dcbb0",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -1779,6 +1779,48 @@
                 "source": "https://github.com/filamentphp/filament"
             },
             "time": "2026-11-13T12:59:18+00:00"
+        },
+        {
+            "name": "flub78/laraskel-charts",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "../laraskel/packages/charts",
+                "reference": "c6782dc0d582ce41606221a5b4215758cd284ba6"
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "flub78/laraskel-core": "@dev",
+                "illuminate/support": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laraskel\\Charts\\ChartsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laraskel\\Charts\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Laraskel — brique visualisation graphique : widgets de graphiques Filament (courbe, barres, secteurs, jauge, aire), sélecteur de période, états vide et erreur explicites.",
+            "keywords": [
+                "chart",
+                "chartjs",
+                "filament",
+                "laraskel",
+                "laravel"
+            ],
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "flub78/laraskel-core",
@@ -12756,6 +12798,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "flub78/laraskel-charts": 20,
         "flub78/laraskel-core": 20,
         "flub78/laraskel-dev": 20,
         "flub78/laraskel-users": 20

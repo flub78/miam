@@ -8,9 +8,9 @@ Menu **Mon profil → Profil**, puis **Enregistrer**.
 |---|---|---|
 | Date de naissance | oui | calcul du budget calorique |
 | Taille (cm, de 100 à 250) | oui | calcul du budget calorique et de l'IMC |
-| Sexe | non, recommandé | la formule du métabolisme de base en dépend |
-| Niveau d'activité physique | non, recommandé | multiplie le métabolisme de base (voir ci-dessous) |
-| Poids et date de départ | non | point de départ des courbes |
+| Sexe | pour le budget proposé | la formule du métabolisme de base en dépend |
+| Niveau d'activité physique | pour le budget proposé | multiplie le métabolisme de base (voir ci-dessous) |
+| Poids et date de départ | non | point de départ du budget proposé tant qu'aucune pesée n'est saisie |
 | Contraintes médicales, allergies, préférences alimentaires | non | contexte donné à l'assistant (à venir) |
 
 Si un champ obligatoire manque, un message sous le champ indique quoi corriger ; rien

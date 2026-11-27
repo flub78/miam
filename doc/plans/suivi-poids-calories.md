@@ -34,7 +34,7 @@ développement du socle.
 | Trait `TracksAuthor` (`created_by` / `updated_by` depuis `Auth::id()`) | Lot 1 → 5 | **Disponible** : `Laraskel\Users\Models\Concerns\TracksAuthor` (brique `laraskel-users`) | — |
 | **Gestion utilisateurs + rôles** (Fortify, `spatie/permission`, modèle `User` extensible, panel Filament d'administration, cycle de vie des comptes) | Lot 1 | **Disponible** : package dédié `flub78/laraskel-users` (`laraskel/doc/plans/socle-auth-roles.md`) | — |
 | Socle Filament (panels, installation, thème charte) | Lot 1 → 5 | **Tranché** : Filament et le panel d'administration viennent de la brique users ; le **panel utilisateur** est créé dans miam (la brique n'en fournit pas) | — |
-| **Visualisation graphique** (widgets de graphiques Filament / Chart.js, sélecteur de période) | Lot 2 | **Disponible** (Lot 1) : `flub78/laraskel-charts` (`laraskel/doc/plans/brique-graphiques.md`). Bandes de zones IMC à ajouter (Lot 2 de la brique) | Léger (complément) |
+| **Visualisation graphique** (widgets de graphiques Filament / Chart.js, sélecteur de période) | Lot 2 | **Disponible** (Lots 1 et 2) : `flub78/laraskel-charts` (`laraskel/doc/plans/brique-graphiques.md`) — bandes de zones, unité dans l'infobulle, rafraîchissement après écriture | — |
 | **Stockage d'image** — disque privé + URL signée (sous-ensemble minimal, pas la médiathèque) | Lot 3 | Réalisable sans brique avec `Storage` natif (§ Lot 3, option A) ; brique optionnelle si extraite d'ici là | Léger |
 | **Pont LLM** (Prism, entrée image, prompts, journalisation, coûts) | Lot 4 | **Disponible** (Lot 1) : `flub78/laraskel-llm` (`laraskel/doc/plans/brique-llm.md`) — plafonds de coûts et données sensibles à venir (Lots 2–3 de la brique) | Léger (compléments) |
 | Signalement à la connexion (bannière « bilan dû ») | Lot 5 | Réalisable dans miam (contrôle au login + notification Filament) ; s'aligner sur `prds/navigation-dashboards.md` si un mécanisme générique arrive | Léger |
@@ -196,77 +196,80 @@ et lit l'évolution de son poids et de son IMC.
 
 **Couvre.** FR-6 à FR-14, FR-28, FR-29, FR-32 à FR-36, FR-59 à FR-61. CU-2, CU-4.
 
-**Dépendances Laraskel — disponibles** (brique `flub78/laraskel-charts`, mode d'emploi :
-`laraskel/doc/development/guide-application-derivee.md` § « Consommer la brique
-graphiques » ; démo `/admin/demo/graphiques` en mode démo).
-
-| Fourni par la brique (Lot 1) | Reste à ajouter à la brique (son Lot 2) |
-|---|---|
-| Widget abstrait `Graphique` : courbe, barres, aire, secteurs, jauge ; séries en pointillés (objectif, budget) ; couleurs par point (écart au budget) ; sélecteur de période 4 sem. / 3 mois / 12 mois / tout ; états vide et erreur ; permission | Bandes de zones colorées (IMC OMS, FR-29) ; infobulle avec unité (FR-34) ; rafraîchissement après écriture (FR-32). À traiter dans `laraskel` au démarrage de ce lot. |
+**Dépendances Laraskel — disponibles** (brique `flub78/laraskel-charts`, Lots 1 et 2 ;
+mode d'emploi : `laraskel/doc/development/guide-application-derivee.md` § « Consommer
+la brique graphiques » ; démo `/admin/demo/graphiques` en mode démo) : widget
+`Graphique`, sélecteur de période, états vide / erreur, bandes de zones (FR-29), unité
+dans l'infobulle (FR-34), évènement de rafraîchissement (FR-32). Correctif à merger
+dans `laraskel` : couleur par point appliquée au contour (points de suspension
+grisés, FR-36).
 
 **Étapes — objectifs et budget.**
-- [ ] Migration `goals` (historisée) : `user_id`, `effective_from`, `target_weight_kg`,
+- [x] Migration `goals` (historisée) : `user_id`, `effective_from`, `target_weight_kg`,
       `target_rate_kg_per_week`, `daily_calorie_budget`, `protein_target_g`,
       `indicative_target_date` + `auditColumns()`. Pas de mise à jour en place : un
       changement crée une ligne (FR-9).
-- [ ] Migration `tracking_settings` : `user_id` unique, `review_interval_days`,
+- [x] Migration `tracking_settings` : `user_id` unique, `review_interval_days`,
       `next_review_on` + `auditColumns()` (l'intervalle et la date active servent au
       Lot 5 ; la table est créée ici car liée au profil de suivi).
-- [ ] Modèles `Goal`, `TrackingSettings` (+ `AppartientAUtilisateur`, factories) ;
+- [x] Modèles `Goal`, `TrackingSettings` (+ `AppartientAUtilisateur`, factories) ;
       accès à l'objectif courant = ligne `effective_from` la plus récente.
-- [ ] Service `App\Services\CalorieBudget` : métabolisme de base Mifflin-St Jeor ×
+- [x] Service `App\Services\CalorieBudget` : métabolisme de base Mifflin-St Jeor ×
       facteur d'activité (`ActivityLevel`) − déficit déduit du rythme visé (FR-6).
       Expose le détail : métabolisme de base, maintenance estimée, déficit, budget
       (FR-7).
-- [ ] Écran Filament « Objectifs » : affiche le calcul détaillé et la mention
+- [x] Écran Filament « Objectifs » : affiche le calcul détaillé et la mention
       « estimation de départ » ; l'utilisateur accepte la valeur proposée ou saisit
       budget / rythme / poids cible / protéines (FR-8) ; historique consultable (FR-9) ;
       date cible indicative calculée + mention « non contractuelle » (FR-10).
 
 **Étapes — pesées et suspensions.**
-- [ ] Migration `weigh_ins` : `user_id`, `measured_on`, `weight_kg`, `body_fat_pct`,
+- [x] Migration `weigh_ins` : `user_id`, `measured_on`, `weight_kg`, `body_fat_pct`,
       `muscle_mass_pct`, `note` + `auditColumns()`.
-- [ ] Migration `suspension_periods` : `user_id`, `starts_on`, `ends_on`, `reason` +
+- [x] Migration `suspension_periods` : `user_id`, `starts_on`, `ends_on`, `reason` +
       `auditColumns()`.
-- [ ] Modèles `WeighIn`, `SuspensionPeriod` (+ trait, factories).
-- [ ] Service `WeightTrend` : moyenne mobile 7 jours (FR-13), pente kg/semaine sur une
+- [x] Modèles `WeighIn`, `SuspensionPeriod` (+ trait, factories).
+- [x] Service `WeightTrend` : moyenne mobile 7 jours (FR-13), pente kg/semaine sur une
       période (FR-14), **exclusion des intervalles de suspension** (FR-61).
-- [ ] Service `Bmi` : IMC + zone de corpulence OMS à partir du poids courant et de la
+- [x] Service `Bmi` : IMC + zone de corpulence OMS à partir du poids courant et de la
       taille (FR-29).
-- [ ] *Resource* Filament « Pesées » : saisie (date par défaut aujourd'hui, modifiable,
+- [x] *Resource* Filament « Pesées » : saisie (date par défaut aujourd'hui, modifiable,
       antérieure possible), correction, suppression (FR-11, FR-12).
-- [ ] *Resource* Filament « Périodes de suspension » : déclaration (dates + motif) ;
+- [x] *Resource* Filament « Périodes de suspension » : déclaration (dates + motif) ;
       pendant une suspension aucune saisie n'est demandée et aucune alarme n'est émise
       (FR-59, FR-60) ; les données saisies quand même sont conservées mais exclues des
       pentes (FR-61).
 
 **Étapes — visualisations.**
-- [ ] Widget « Courbe de poids » : points de pesée, moyenne mobile 7 j, ligne du poids
+- [x] Widget « Courbe de poids » : points de pesée, moyenne mobile 7 j, ligne du poids
       cible (FR-28).
-- [ ] Widget « Courbe d'IMC » : bandes de couleur des zones OMS, repère du poids cible
+- [x] Widget « Courbe d'IMC » : bandes de couleur des zones OMS, repère du poids cible
       (FR-29).
-- [ ] Sélecteur de période commun (4 semaines / 3 mois / tout) (FR-35).
-- [ ] Détail d'un point au survol / tap (FR-34).
-- [ ] Périodes de suspension distinguées visuellement, sans rupture trompeuse (FR-36).
-- [ ] Rafraîchissement automatique après toute écriture de pesée (FR-32).
-- [ ] Rendu vérifié sur smartphone et PC (FR-33) — contrôle navigateur manuel.
+- [x] Sélecteur de période commun (4 semaines / 3 mois / tout) (FR-35).
+- [x] Détail d'un point au survol / tap (FR-34).
+- [x] Périodes de suspension distinguées visuellement, sans rupture trompeuse (FR-36) :
+      points grisés, moyenne mobile continue (choix et alternatives : note de design §4).
+- [x] Rafraîchissement automatique après toute écriture de pesée (FR-32).
+- [ ] Rendu vérifié sur smartphone et PC (FR-33) — contrôle navigateur manuel : **PC fait** ; smartphone à faire.
 
 **Tests.**
-- [ ] Unitaire `CalorieBudget` : valeurs de référence (homme / femme, plusieurs
+- [x] Unitaire `CalorieBudget` : valeurs de référence (homme / femme, plusieurs
       niveaux d'activité, plusieurs rythmes) ; détail cohérent avec le budget.
-- [ ] Unitaire `WeightTrend` : moyenne mobile, pente, exclusion d'une période de
+- [x] Unitaire `WeightTrend` : moyenne mobile, pente, exclusion d'une période de
       suspension.
-- [ ] Unitaire `Bmi` : frontières des zones OMS.
-- [ ] Feature : historisation d'un changement d'objectif (ancienne ligne conservée).
-- [ ] Feature : CRUD pesées, saisie antérieure, isolation entre utilisateurs.
-- [ ] Feature : une pesée créée pendant une suspension est exclue de la pente mais
+- [x] Unitaire `Bmi` : frontières des zones OMS.
+- [x] Feature : historisation d'un changement d'objectif (ancienne ligne conservée).
+- [x] Feature : CRUD pesées, saisie antérieure, isolation entre utilisateurs.
+- [x] Feature : une pesée créée pendant une suspension est exclue de la pente mais
       visible dans la liste.
-- [ ] Feature/rendu : les widgets se peuplent des seules données de l'utilisateur.
+- [x] Feature/rendu : les widgets se peuplent des seules données de l'utilisateur.
+- [x] Unitaire / Feature : écran « Objectifs » (proposition, profil incomplet, refus
+      hors bornes), suspensions (CRUD, dates incohérentes), tendance (`Tendance`).
 
 **Documentation utilisateur.**
-- [ ] `doc/users/objectifs.md` — budget calculé, ajustement manuel, historique.
-- [ ] `doc/users/pesees.md` — saisir une pesée, lire la courbe et la tendance.
-- [ ] `doc/users/suspension.md` — déclarer une période de suspension.
+- [x] `doc/users/objectifs.md` — budget calculé, ajustement manuel, historique.
+- [x] `doc/users/pesees.md` — saisir une pesée, lire la courbe et la tendance.
+- [x] `doc/users/suspension.md` — déclarer une période de suspension.
 
 ---
 
@@ -493,7 +496,7 @@ CU-6 (croisement bilan / contexte).
 |---|---|---|---|
 | 0 | Fondations miam (test, isolation, doc) | `laraskel-core` (fait) | Fait (reste un test « base persistante » ultérieur) |
 | 1 | Comptes et profil | Brique users/rôles + Filament + `TracksAuthor` | **Fait** (2026-11-19) |
-| 2 | Objectifs, budget, pesées, courbes | Brique visualisation graphique | **À faire** (brique disponible ; bandes IMC à compléter) |
+| 2 | Objectifs, budget, pesées, courbes | Brique visualisation graphique | **Fait** (2026-11-27) — reste le contrôle sur smartphone |
 | 3 | Journal alimentaire + table de référence (manuel) | Stockage image (léger) | À faire (dépend Lot 1, 2) |
 | 4 | Assistant : estimation, coaching, menus | Brique `laraskel-llm` | À faire (brique disponible, Lot 1 ; dépend Lot 3) |
 | 5 | Bilan, journal, régularité, import | Signalement connexion (léger) | À faire (dépend Lot 2, 3) |

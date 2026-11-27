@@ -14,11 +14,11 @@ ci-dessous s'étoffe lot par lot.
 - [Comptes](comptes.md) — première connexion, mot de passe oublié, rôle de l'administrateur
 - [Profil](profil.md) — renseigner son profil, changements d'habitudes
 
-### Objectifs, pesées et courbes — _Lot 2, à venir_
+### Objectifs, pesées et courbes
 
-- `objectifs.md` — budget calculé, ajustement manuel, historique
-- `pesees.md` — saisir une pesée, lire la courbe et la tendance
-- `suspension.md` — déclarer une période de suspension
+- [Objectifs](objectifs.md) — budget calculé, ajustement manuel, historique
+- [Pesées](pesees.md) — saisir une pesée, lire les courbes et la tendance
+- [Suspension](suspension.md) — déclarer une période de suspension
 
 ### Journal alimentaire — _Lot 3, à venir_
 

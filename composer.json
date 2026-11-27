@@ -11,6 +11,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "flub78/laraskel-charts": "@dev",
         "flub78/laraskel-core": "@dev",
         "flub78/laraskel-users": "@dev",
         "laravel/framework": "^13.17",
