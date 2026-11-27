@@ -38,7 +38,7 @@
 
                 <nav class="flex items-center gap-3 text-sm">
                     @auth
-                        <a href="{{ url('/dashboard') }}"
+                        <a href="{{ url('/app') }}"
                            class="inline-flex items-center rounded-xl bg-miam-green px-4 py-2 font-medium text-white transition hover:bg-miam-green/90">
                             Tableau de bord
                         </a>

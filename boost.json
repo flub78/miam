@@ -6,6 +6,9 @@
     "guidelines": true,
     "mcp": true,
     "nightwatch": false,
+    "packages": [
+        "flub78/laraskel-dev"
+    ],
     "sail": false,
     "skills": [
         "infer-conventions",
